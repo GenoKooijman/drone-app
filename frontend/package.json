@@ -18,10 +18,14 @@
 	},
 	"dependencies": {
 		"@dimforge/rapier3d": "^0.15.0",
+		"@dimforge/rapier3d-compat": "^0.15.0",
 		"@tailwindcss/vite": "^4.0.15",
-		"ammo.js": "^0.0.10",
+		"@threlte/core": "^8.0.1",
+		"@threlte/extras": "^9.1.0",
+		"@threlte/rapier": "^3.1.0",
 		"socket.io-client": "^4.8.1",
 		"tailwindcss": "^4.0.15",
-		"three": "^0.174.0"
+		"three": "^0.174.0",
+		"vite-plugin-wasm": "^3.4.1"
 	}
 }
