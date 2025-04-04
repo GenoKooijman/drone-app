@@ -2,9 +2,14 @@ import * as THREE from "three";
 
 let velocity = new THREE.Vector3(0, 0, 0);
 let acceleration = new THREE.Vector3(0, 0, 0);
-let friction = 0.99; // Increased friction for better control
-let gravity = new THREE.Vector3(0, -0.002, 0); // Simulated gravity
-let damping = 0.98; // Increased damping for smoother movement
+let friction = 0.99;
+let gravity = new THREE.Vector3(0, -0.002, 0);
+let damping = 0.98;
+
+let powerOn = false;
+
+const groundY = 0;
+const droneHalfHeight = 0.25; // From BoxGeometry height = 0.5
 
 export function applyPhysics(drone) {
   if (!drone) return;
@@ -12,42 +17,61 @@ export function applyPhysics(drone) {
   // Apply gravity
   velocity.add(gravity);
 
-  // Counteract gravity to make the drone float
-  if (velocity.y < 0) {
-    velocity.y += 0.002; // Adjust this value to fine-tune the floating effect
+  // apply floating if power on
+  if (powerOn && velocity.y < 0) {
+    velocity.y += 0.002;
   }
 
-  // Apply acceleration to velocity
+  // Apply acceleration
   velocity.add(acceleration);
 
-  // Apply friction
   velocity.multiplyScalar(friction);
-
-  // Apply damping for smoother movement
   velocity.multiplyScalar(damping);
 
-  // Smoothly interpolate the drone's position
-  const targetPosition = new THREE.Vector3().addVectors(drone.position, velocity);
-  drone.position.lerp(targetPosition, 0.1); // Use lerp for smooth position updates
+  // Predict next position
+  const nextPosition = new THREE.Vector3().addVectors(drone.position, velocity);
 
-  // Smoothly interpolate the drone's rotation
+  // Ground collision check
+  const nextBottomY = nextPosition.y - droneHalfHeight;
+  if (nextBottomY <= groundY) {
+    // Snap to ground
+    nextPosition.y = groundY + droneHalfHeight;
+    velocity.y = 0;
+  }
+
+  // Smooth
+  drone.position.lerp(nextPosition, 0.1);
+
   const targetRotation = new THREE.Quaternion().setFromEuler(drone.rotation);
-  drone.quaternion.slerp(targetRotation, 0.1); // Use slerp for smooth rotation updates
+  drone.quaternion.slerp(targetRotation, 0.1);
 
-  // Reset acceleration
+  // Reset accel
   acceleration.set(0, 0, 0);
 }
 
 export function moveDrone(drone, direction) {
   if (!drone) return;
 
-  const force = 0.1; // Increased movement force for faster movement
-  const rotationSpeed = 0.1; // Increased rotation speed
+  const force = 0.1; 
+  const rotationSpeed = 0.05;
+
+  if (direction === "powerOn") {
+    powerOn = true; 
+  }
+  if (direction === "powerOff") {
+    powerOn = false; 
+  }
 
   if (direction === "up") acceleration.y += force;
   if (direction === "down") acceleration.y -= force;
-  if (direction === "left") drone.rotation.y += rotationSpeed;
-  if (direction === "right") drone.rotation.y -= rotationSpeed;
+
+  if (direction === "left" || direction === "right") {
+    const quaternion = new THREE.Quaternion();
+    const axis = new THREE.Vector3(0, 1, 0); // Rotate Y
+    const angle = direction === "left" ? rotationSpeed : -rotationSpeed;
+    quaternion.setFromAxisAngle(axis, angle);
+    drone.quaternion.multiplyQuaternions(quaternion, drone.quaternion);
+  }
 
   if (direction === "forward" || direction === "backward") {
     const movement = new THREE.Vector3();

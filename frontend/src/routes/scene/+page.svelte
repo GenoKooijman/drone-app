@@ -2,13 +2,13 @@
   import { onMount } from "svelte";
   import { socket } from "$lib/socket";
   import * as THREE from "three";
-  import { moveDrone, applyPhysics } from "$lib/physics.js"; // ✅ Import physics functions
+  import { moveDrone, applyPhysics } from "$lib/physics.js"; 
 
   let scene, camera, renderer, drone, light;
 
   onMount(() => {
     if (document.querySelector("canvas")) {
-      document.querySelector("canvas").remove(); // ✅ Prevent duplicate renderers
+      document.querySelector("canvas").remove(); 
     }
 
     const init = () => {
@@ -140,7 +140,7 @@
     const animate = () => {
       requestAnimationFrame(animate);
 
-      applyPhysics(drone); // ✅ Apply physics calculations
+      applyPhysics(drone);
 
       // Rotate propellers
       drone.children.forEach((propeller) => {
@@ -164,7 +164,7 @@
     animate();
 
     socket.on("updateDrone", (data) => {
-      moveDrone(drone, data.direction); // ✅ Move drone using physics.js
+      moveDrone(drone, data.direction);
     });
   });
 </script>
