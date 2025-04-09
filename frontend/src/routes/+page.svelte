@@ -1,3 +1,7 @@
+<script>
+    export const prerender = true;
+</script>
+
 <p>
     <a href="/scene">
         <button>Go to Scene</button>

@@ -4,6 +4,8 @@
   import * as THREE from "three";
   import { moveDrone, applyPhysics } from "$lib/physics.js"; 
 
+  export const prerender = true;
+
   let scene, camera, renderer, drone, light;
 
   onMount(() => {
@@ -20,9 +22,8 @@
       scene.add(light);
       scene.add(new THREE.AmbientLight(0x404040));
 
-      // Adjust camera FOV to make the scene wider
       camera = new THREE.PerspectiveCamera(
-        90, // Increased from 75 to 90 for a wider view
+        90,
         window.innerWidth / window.innerHeight,
         0.1,
         1000
@@ -31,7 +32,6 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
-      // Ensure only one drone exists
       if (!drone) {
         // Drone body
         const bodyGeometry = new THREE.BoxGeometry(2, 0.5, 2);
@@ -68,7 +68,7 @@
             propellerGroup.add(blade);
           }
 
-          // Cylinder around blades
+          // Cylinder blades
           const cylinderGeometry = new THREE.CylinderGeometry(0.5, 0.5, 0.1, 32);
           const cylinderMaterial = new THREE.MeshStandardMaterial({
             color: 0x888888,
@@ -84,7 +84,7 @@
           return propellerGroup;
         }
 
-        // Four propellers positioned on drone
+        // Four propellers 
         const positions = [
           [1, 0.25, 1],
           [-1, 0.25, 1],
@@ -100,31 +100,30 @@
         });
       }
 
-      // Position the camera
       camera.position.set(0, 3, -10);
 
-      // Grid - Increase size for a wider scene
-      const gridHelper = new THREE.GridHelper(400, 100); // Increased size from 200, 50
+      // Grid
+      const gridHelper = new THREE.GridHelper(400, 100);
       scene.add(gridHelper);
 
       // Walls
       const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide });
 
       const createWall = (x, y, z, rotY = 0) => {
-        const wall = new THREE.Mesh(new THREE.PlaneGeometry(400, 50), wallMaterial); // Increased width from 200 to 400
+        const wall = new THREE.Mesh(new THREE.PlaneGeometry(400, 50), wallMaterial);
         wall.position.set(x, y, z);
         wall.rotation.y = rotY;
         scene.add(wall);
       };
 
-      createWall(0, 25, -200); // Adjusted position for wider walls
+      createWall(0, 25, -200); 
       createWall(0, 25, 200, Math.PI);
       createWall(-200, 25, 0, Math.PI / 2);
       createWall(200, 25, 0, -Math.PI / 2);
 
       // Ground
       const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(400, 400), // Increased size from 200x200 to 400x400
+        new THREE.PlaneGeometry(400, 400), 
         new THREE.MeshStandardMaterial({ color: 0x808080, metalness: 0.2, roughness: 0.8 })
       );
       ground.rotation.x = -Math.PI / 2;
@@ -147,7 +146,7 @@
         propeller.rotation.z += 0.1;
       });
 
-      // Smooth camera follow
+      // Smoother camera follow
       const offset = new THREE.Vector3(0, 2, -5);
       const droneWorldPosition = new THREE.Vector3();
       drone.getWorldPosition(droneWorldPosition);
